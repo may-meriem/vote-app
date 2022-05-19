@@ -127,7 +127,7 @@ spec:
     spec:
       containers:
       - name: result
-        image: bedrettinyuce/result:latest
+        image: cicd-demo/result:latest
         ports:
         - containerPort: 80
           name: result
@@ -167,7 +167,7 @@ spec:
     spec:
       containers:
       - name: vote
-        image: bedrettinyuce/vote:latest
+        image: cicd-demo/vote:latest
         ports:
         - containerPort: 80
           name: vote
@@ -202,5 +202,5 @@ spec:
         app: worker
     spec: 
       containers: 
-      - image: bedrettinyuce/worker:latest
+      - image: cicd-demo/worker:latest
         name: worker
