@@ -16,7 +16,7 @@ spec:
     app: redis
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: DeploymentConfig
 metadata:
   name: redis
   labels:
@@ -56,7 +56,7 @@ spec:
     app: db
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: DeploymentConfig
 metadata:
   name: db
   labels:
@@ -110,7 +110,7 @@ spec:
     app: result
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: DeploymentConfig
 metadata:
   name: result
   labels:
@@ -150,7 +150,7 @@ spec:
     app: vote
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: DeploymentConfig
 metadata:
   name: vote
   labels:
@@ -186,7 +186,7 @@ spec:
     app: worker
 --- 
 apiVersion: apps/v1
-kind: Deployment
+kind: DeploymentConfig
 metadata: 
   labels: 
     app: worker
