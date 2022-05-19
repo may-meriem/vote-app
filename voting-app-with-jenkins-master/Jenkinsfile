@@ -1,51 +1,101 @@
 pipeline {
   agent any
+  environnement{
+	  registry = "docker-registry.default.svc:5000"
+  }
   stages {
-    stage('Snyk scan') {
-	  steps {
-		snykSecurity additionalArguments: '--all-projects', snykInstallation: 'snyk', snykTokenId: 'SNYK_TOKEN'
-	  }
-	}
+    
     stage('Build result') {
       steps {
-        sh 'docker build -t bedrettinyuce/result ./result'
+        sh 'docker build -t cicd-demo/result ./voting-app-with-jenkins-master/result'
       }
     } 
     stage('Build vote') {
       steps {
-        sh 'docker build -t bedrettinyuce/vote ./vote'
+        sh 'docker build -t cicd-demo/vote ./voting-app-with-jenkins-master/vote'
       }
     }
     stage('Build worker') {
       steps {
-        sh 'docker build -t bedrettinyuce/worker ./worker'
+        sh 'docker build -t cicd-demo/worker ./voting-app-with-jenkins-master/worker'
       }
     }
-    stage('Push result image') {
+    stage('Tag Push result') {
+              steps {
+	      	script {
+                	openshift.withCluster() {
+                		openshift.withProject() {
+					openshift.withCredentials('okd-cred'){
+                      				openshift.tag("cicd-demo/result:latest", "registry/cicd-demo/result:latest")
+						sh 'docker push registry/cicd-demo/result:latest'
+					}
+					
+                    		}
+                  	}
+                }
+              }
+    } 
+    stage('Tag Push vote') {
+              steps {
+	      	script {
+                	openshift.withCluster() {
+                		openshift.withProject() {
+					openshift.withCredentials('okd-cred'){
+                      				openshift.tag("cicd-demo/vote:latest", "registry/cicd-demo/vote:latest")
+						sh 'docker push registry/cicd-demo/vote:latest'
+					}
+					
+                    		}
+                  	}
+                }
+              }
+    }  
+    stage('Tag Push worker') {
+              steps {
+	      	script {
+                	openshift.withCluster() {
+                		openshift.withProject() {
+					openshift.withCredentials('okd-cred'){
+                      				openshift.tag("cicd-demo/worker:latest", "registry/cicd-demo/worker:latest")
+						sh 'docker push registry/cicd-demo/worker:latest'
+					}
+					
+                    		}
+                  	}
+                }
+              }
+    }  
+    stage('Deploy result image') {
       steps {
-        withDockerRegistry(credentialsId: 'dockerhub', url: '') {
-          sh 'docker push bedrettinyuce/result'
-        }
-      }
+      	script {
+        	openshift.withCluster() {
+                	openshift.withProject() {
+                      		openshift.selector("dc", "result").rollout().latest()
+                   	}
+                  }
+      	}
     }
-    stage('Push vote image') {
+     stage('Deploy vote image') {
       steps {
-        withDockerRegistry(credentialsId: 'dockerhub', url: '') {
-          sh 'docker push bedrettinyuce/vote'
-        }
-      }
-    }
-    stage('Push worker image') {
-      steps {
-        withDockerRegistry(credentialsId: 'dockerhub', url: '') {
-          sh 'docker push bedrettinyuce/worker'
-        }
-      }
-    }
-    stage('Deploy to Kubernetes') {
-      steps {
-        kubernetesDeploy(configs: 'kube-deployment.yml', kubeconfigId: 'kubeconf')
-      }
-    }
+      	script {
+        	openshift.withCluster() {
+                	openshift.withProject() {
+                      		openshift.selector("dc", "vote").rollout().latest()
+                   	}
+                  }
+      	}
+     }
+     stage('Deploy worker image') {
+     	steps {
+      		script {
+        		openshift.withCluster() {
+                		openshift.withProject() {
+                      			openshift.selector("dc", "worker").rollout().latest()
+                   		}
+                }
+      	}
+     }
+      
+    
   }
 }
