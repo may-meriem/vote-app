@@ -73,7 +73,8 @@ pipeline {
                       		openshift.selector("dc", "result").rollout().latest()
                    	}
                   }
-      	}
+	}
+      }
     }
      stage('Deploy vote image') {
       steps {
@@ -83,7 +84,9 @@ pipeline {
                       		openshift.selector("dc", "vote").rollout().latest()
                    	}
                   }
-      	}
+      
+	}
+      }
      }
      stage('Deploy worker image') {
      	steps {
@@ -92,8 +95,9 @@ pipeline {
                 		openshift.withProject() {
                       			openshift.selector("dc", "worker").rollout().latest()
                    		}
-                }
-      	}
+                        }
+		}
+	}
      }
       
     
