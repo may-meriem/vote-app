@@ -1,10 +1,13 @@
 pipeline {
   agent any
-  environnement{
+  environement{
 	  registry = "docker-registry.default.svc:5000"
   }
   stages {
-    
+	  
+    stage('clone repo'){
+	
+    }
     stage('Build result') {
       steps {
         sh 'docker build -t cicd-demo/result ./voting-app-with-jenkins-master/result'
@@ -21,8 +24,8 @@ pipeline {
       }
     }
     stage('Tag Push result') {
-              steps {
-	      	script {
+    	steps {
+		script {
                 	openshift.withCluster() {
                 		openshift.withProject() {
 					openshift.withCredentials('okd-cred'){
@@ -33,11 +36,11 @@ pipeline {
                     		}
                   	}
                 }
-              }
+    	}
     } 
     stage('Tag Push vote') {
-              steps {
-	      	script {
+    	steps {
+		script {
                 	openshift.withCluster() {
                 		openshift.withProject() {
 					openshift.withCredentials('okd-cred'){
@@ -48,11 +51,11 @@ pipeline {
                     		}
                   	}
                 }
-              }
+    	}
     }  
     stage('Tag Push worker') {
-              steps {
-	      	script {
+    	steps {
+		script {
                 	openshift.withCluster() {
                 		openshift.withProject() {
 					openshift.withCredentials('okd-cred'){
@@ -63,30 +66,30 @@ pipeline {
                     		}
                   	}
                 }
-              }
+    	}
     }  
     stage('Deploy result image') {
-      steps {
-      	script {
-        	openshift.withCluster() {
-                	openshift.withProject() {
-                      		openshift.selector("dc", "result").rollout().latest()
-                   	}
-                  }
-	}
-      }
+    	steps {
+      		script {
+        		openshift.withCluster() {
+                		openshift.withProject() {
+                      			openshift.selector("dc", "result").rollout().latest()
+                   		}
+                  	}
+		}
+    	}
     }
-     stage('Deploy vote image') {
-      steps {
-      	script {
-        	openshift.withCluster() {
-                	openshift.withProject() {
-                      		openshift.selector("dc", "vote").rollout().latest()
-                   	}
-                  }
+    stage('Deploy vote image') {
+    	steps {
+      		script {
+        		openshift.withCluster() {
+                		openshift.withProject() {
+                      			openshift.selector("dc", "vote").rollout().latest()
+                   		}
+                  	}
       
-	}
-      }
+		}
+      	}
      }
      stage('Deploy worker image') {
      	steps {
