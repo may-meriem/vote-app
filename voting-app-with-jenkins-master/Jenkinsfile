@@ -1,7 +1,7 @@
 pipeline {
   agent any
   environement{
-	  registry = "docker-registry.default.svc:5000"
+	  REGISTRY = "docker-registry.default.svc:5000"
   }
   stages {
 	  
@@ -29,7 +29,7 @@ pipeline {
                 	openshift.withCluster() {
                 		openshift.withProject() {
 					openshift.withCredentials('okd-cred'){
-                      				openshift.tag("cicd-demo/result:latest", "registry/cicd-demo/result:latest")
+						openshift.tag("cicd-demo/result:latest", "${REGISTRY}/cicd-demo/result:latest")
 						sh 'docker push registry/cicd-demo/result:latest'
 					}
 					
@@ -44,7 +44,7 @@ pipeline {
                 	openshift.withCluster() {
                 		openshift.withProject() {
 					openshift.withCredentials('okd-cred'){
-                      				openshift.tag("cicd-demo/vote:latest", "registry/cicd-demo/vote:latest")
+						openshift.tag("cicd-demo/vote:latest", "${REGISTRY}/cicd-demo/vote:latest")
 						sh 'docker push registry/cicd-demo/vote:latest'
 					}
 					
@@ -59,7 +59,7 @@ pipeline {
                 	openshift.withCluster() {
                 		openshift.withProject() {
 					openshift.withCredentials('okd-cred'){
-                      				openshift.tag("cicd-demo/worker:latest", "registry/cicd-demo/worker:latest")
+						openshift.tag("cicd-demo/worker:latest", "${REGISTRY}/cicd-demo/worker:latest")
 						sh 'docker push registry/cicd-demo/worker:latest'
 					}
 					
